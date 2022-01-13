@@ -17,6 +17,9 @@ class GeoLocalizationNet(nn.Module):
         self.backbone = get_backbone(args)
         if args.type == "NetVlad":
             self.aggregation = nn.Sequential(L2Norm(), netvlad.NetVLAD())
+        elif args.type == "GEM":
+            #todo
+        else:
         self.aggregation = nn.Sequential(L2Norm(),
                                          torch.nn.AdaptiveAvgPool2d(1),
                                          Flatten())
