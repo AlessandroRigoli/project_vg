@@ -4,8 +4,8 @@ import logging
 import torchvision
 import torch.nn as nn
 import torch.nn.functional as F
-import netvlad 
-
+import netvlad
+import gem
 
 class GeoLocalizationNet(nn.Module):
     """The model is composed of a backbone and an aggregation layer.
@@ -15,14 +15,17 @@ class GeoLocalizationNet(nn.Module):
     def __init__(self, args):
         super().__init__()
         self.backbone = get_backbone(args)
-        if args.type == "NetVlad":
-            self.aggregation = nn.Sequential(L2Norm(), netvlad.NetVLAD())
+
+        if args.type == "NetVLAD":
+            logging.debug("using NetVlad head")
+            self.aggregation = nn.Sequential(L2Norm(), netvlad.NetVLAD(num_clusters=args.num_clusters, dim=256))
         elif args.type == "GEM":
-            #todo
+            logging.debug("Using GEM head")
+            self.aggregation = nn.Sequential(L2Norm(), gem.GeM(p=args.gem_p), Flatten())
         else:
-        self.aggregation = nn.Sequential(L2Norm(),
-                                         torch.nn.AdaptiveAvgPool2d(1),
-                                         Flatten())
+            logging.debug("Using default head")
+            self.aggregation = nn.Sequential(L2Norm(),torch.nn.AdaptiveAvgPool2d(1), Flatten())
+
     def forward(self, x):
         x = self.backbone(x)
         x = self.aggregation(x)
@@ -39,8 +42,9 @@ def get_backbone(args):
     logging.debug("Train only conv4 of the ResNet-18 (remove conv5), freeze the previous ones")
     layers = list(backbone.children())[:-3]
     backbone = torch.nn.Sequential(*layers)
-    args.features_dim = 256  # Number of channels in conv4
+    #args.features_dim = 256  # Number of channels in conv4
     return backbone
+
 
 
 class Flatten(torch.nn.Module):
