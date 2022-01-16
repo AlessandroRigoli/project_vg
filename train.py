@@ -9,6 +9,8 @@ import multiprocessing
 from os.path import join
 from datetime import datetime
 from torch.utils.data.dataloader import DataLoader
+from os.path import exists
+import h5py
 torch.backends.cudnn.benchmark= True  # Provides a speedup
 
 import util
@@ -41,6 +43,10 @@ test_ds = datasets_ws.BaseDataset(args, args.datasets_folder, "pitts30k", "test"
 logging.info(f"Test set: {test_ds}")
 
 #### Initialize model
+if args.type == "NetVLAD":
+  args.features_dim = args.num_clusters * 256
+else:
+  args.features_dim = 256
 model = network.GeoLocalizationNet(args)
 model = model.to(args.device)
 
@@ -52,6 +58,24 @@ best_r5 = 0
 not_improved_num = 0
 
 logging.info(f"Output dimension of the model is {args.features_dim}")
+
+#call __init__params if the choosen layer is netVlad
+#run cluster.py before train.py
+if args.type == 'NetVLAD':
+    net_vlad = model.aggregation[1]
+    #todo: make it dataset independent 
+    initcache = join(args.datasets_folder, 'centroids', "pitts30k" + '_' + str(args.num_clusters) + '_desc_cen.hdf5')
+
+    if not exists(initcache):
+        raise FileNotFoundError('Could not find clusters, please run cluster.py before proceed')
+        exit(-1)
+
+    with h5py.File(initcache, mode='r') as h5: 
+        clsts = h5.get("centroids")[...]
+        traindescs = h5.get("descriptors")[...]
+        net_vlad.init_params(clsts, traindescs) 
+        del clsts, traindescs
+    model = model.to(args.device)
 
 #### Training loop
 for epoch_num in range(args.epochs_num):
@@ -146,4 +170,3 @@ model.load_state_dict(best_model_state_dict)
 
 recalls, recalls_str = test.test(args, test_ds, model)
 logging.info(f"Recalls on {test_ds}: {recalls_str}")
-
