@@ -37,6 +37,11 @@ def parse_arguments():
     parser.add_argument("--exp_name", type=str, default="default",
                         help="Folder name of the current run (saved in ./runs/)")
     
+    #netVlad & GEM params 
+    parser.add_argument("--num_clusters", type=int, default=64, help="number of clusters for the netVlad layer")
+    parser.add_argument("--type", type=str, default="default", help="type of head to implement, NetVlad or GEM")
+    parser.add_argument("--gem_p", type=int, default=3, help = "p value for GeM layer")
+    
     args = parser.parse_args()
     
     if args.queries_per_epoch % args.cache_refresh_rate != 0:
