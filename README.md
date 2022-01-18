@@ -36,3 +36,17 @@ To visualize all the parameters that it is possible to set, run
 
 ```python3 train.py -h```
 
+
+# NetVlad Layer
+to get start first install all the requirements
+
+ ```pip install -r requirements.txt```
+
+then, to train the NetVlad layer, you have to run first cluster.py in order to calculate centroids for the given dataset. note that --type is redundant, because we run cluster.py only for NetVLAD layer.
+
+```python3 cluster.py --type NetVLAD --datasets_folder path/to/folder/containing/pitts30k   --num_clusters 64```
+
+Once you have computed the centroids for the dataset, you can train, validate and test the model on Pitts30k, by running:
+
+```python3 train.py --type NetVLAD --datasets_folder path/to/folder/containing/pitts30k --num_clusters 64```
+
