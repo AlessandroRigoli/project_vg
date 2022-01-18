@@ -43,10 +43,6 @@ test_ds = datasets_ws.BaseDataset(args, args.datasets_folder, "pitts30k", "test"
 logging.info(f"Test set: {test_ds}")
 
 #### Initialize model
-if args.type == "NetVLAD":
-  args.features_dim = args.num_clusters * 256
-else:
-  args.features_dim = 256
 model = network.GeoLocalizationNet(args)
 model = model.to(args.device)
 
