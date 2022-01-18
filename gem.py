@@ -13,7 +13,7 @@ def gem(x, p=3, eps=1e-6):
          (x.size(-2), x.size(-1)) ).pow(1./p
         
         )
-
+ 
 
 class GeM(nn.Module):
 
