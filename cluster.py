@@ -21,7 +21,7 @@ import parser
 import datasets_ws
 
 # call with:
-# python cluster.py  --num_clusters=64 --datasets_folder path/to/dataset/folder
+# python cluster.py  --num_clusters=64  --datasets_folder path/to/dataset/folder
 
 args = parser.parse_arguments()
 nDescriptors = 50000
