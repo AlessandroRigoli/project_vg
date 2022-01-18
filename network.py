@@ -42,7 +42,10 @@ def get_backbone(args):
     logging.debug("Train only conv4 of the ResNet-18 (remove conv5), freeze the previous ones")
     layers = list(backbone.children())[:-3]
     backbone = torch.nn.Sequential(*layers)
-    #args.features_dim = 256  # Number of channels in conv4
+    if args.type == "NetVLAD":
+        args.features_dim = args.num_clusters * 256 #num_cluster * dim as NetVlad input
+    else:
+         args.features_dim = 256 # Number of channels in conv4 
     return backbone
 
 
