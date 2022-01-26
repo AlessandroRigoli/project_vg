@@ -73,6 +73,8 @@ if args.type == 'NetVLAD':
         del clsts, traindescs
     model = model.to(args.device)
 
+#resume checkpoint
+
 #### Training loop
 for epoch_num in range(args.epochs_num):
     logging.info(f"Start training epoch: {epoch_num:02d}")
